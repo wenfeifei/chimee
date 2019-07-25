@@ -1,5 +1,5 @@
 import { runRejectableQueue, runStoppableQueue, deletePropertyIfItIsEmpty, transObjectAttrIntoArray, isSupportedKernelType } from 'helper/utils';
-describe('runRejectableQueue', async () => {
+describe('runRejectableQueue', () => {
   test('empty', () => {
     expect(runRejectableQueue([])).resolves.toBe();
   });
@@ -26,6 +26,7 @@ describe('runRejectableQueue', async () => {
   test('function and promise.reject', () => {
     expect(runRejectableQueue([
       () => {},
+      // eslint-disable-next-line prefer-promise-reject-errors
       Promise.reject(),
       () => new Promise(resolve => resolve()),
     ])).rejects.toMatch('stop');
@@ -34,6 +35,7 @@ describe('runRejectableQueue', async () => {
     expect(runRejectableQueue([
       () => {},
       Promise.resolve(),
+      // eslint-disable-next-line prefer-promise-reject-errors
       () => new Promise((resolve, reject) => reject()),
     ])).rejects.toMatch('stop');
   });
@@ -57,11 +59,12 @@ describe('runRejectableQueue', async () => {
     ])).rejects.toBe(error);
   });
   test('reject info catch', async () => {
+    const error = new Error('test');
     await expect(runRejectableQueue([
       () => {},
-      () => Promise.reject('abc'),
+      () => Promise.reject(error),
       () => {},
-    ])).rejects.toBe('abc');
+    ])).rejects.toBe(error);
   });
 });
 

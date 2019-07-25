@@ -86,12 +86,13 @@ describe("plugin's error", () => {
   });
 
   test('inited with reject', async () => {
+    const error = new Error('test');
     const plugin = new Plugin({
       id: 'err',
       inited() {
-        return Promise.reject();
+        return Promise.reject(error);
       },
     }, dispatcher);
-    expect(plugin.runInitedHook({})).rejects.toBe();
+    expect(plugin.runInitedHook({})).rejects.toBe(error);
   });
 });
